@@ -11,60 +11,59 @@ file_to_output = os.path.join("analysis", "election_analysis.txt")  # Output fil
 
 # Initialize variables to track the election data
 total_votes = 0  # Track the total number of votes cast
+candidate_vote = {}
 
-# Define lists and dictionaries to track candidate names and vote counts
+# Open and read the csv
+with open(file_to_load) as csvfile:
+    csvreader = csv.reader(csvfile, delimiter=',')
+
+    # read the header row
+    csv_header = next(csvreader)
+    print(f"CSV Header: {csv_header}")
+
+    # Read each row of data after the header
+    for row in csvreader:
+        print(row) 
+        total_votes += 1 #total votes
+        candidate= row[2] 
+
+        #count votes for each candidate 
+        if candidate in candidate_vote:
+            candidate_vote [candidate] += 1 
+        else:
+            candidate_vote [candidate] = 1
+
+    # caluclate the percentage of each candidates per vote count
+    candidate_percentage = {candidate:(votes/ total_votes)*100 for candidate, votes in candidate_vote.items()}
+
+    # determine the winner 
+    winner = ""
+    winning_count = 0
+    for candidate, votes in candidate_vote.items():
+        if votes > winning_count:
+            winning_count = votes
+            winner = candidate 
+
+#output summary 
+output =f'''
+Election Results 
+--------------------------
+Total_votes: {total_votes}
+'''
+
+#add each candidate's results to the output 
+for candidate, votes in candidate_vote.items():
+    percentage = candidate_percentage[candidate]
+    output += f"{candidate}: {percentage:.3f}% ({votes})\n"
+
+output += f"--------------------------\n"
+output += f"Winner: {winner}\n"
+output += f"--------------------------\n"
 
 
-# Winning Candidate and Winning Count Tracker
-
-
-# Open the CSV file and process it
-with open(file_to_load) as election_data:
-    reader = csv.reader(election_data)
-
-    # Skip the header row
-    header = next(reader)
-
-    # Loop through each row of the dataset and process it
-    for row in reader:
-
-        # Print a loading indicator (for large datasets)
-        print(". ", end="")
-
-        # Increment the total vote count for each row
-
-
-        # Get the candidate's name from the row
-
-
-        # If the candidate is not already in the candidate list, add them
-
-
-        # Add a vote to the candidate's count
-
+#print the output 
+print(output)
 
 # Open a text file to save the output
 with open(file_to_output, "w") as txt_file:
-
-    # Print the total vote count (to terminal)
-
-
-    # Write the total vote count to the text file
-
-
-    # Loop through the candidates to determine vote percentages and identify the winner
-
-
-        # Get the vote count and calculate the percentage
-
-
-        # Update the winning candidate if this one has more votes
-
-
-        # Print and save each candidate's vote count and percentage
-
-
-    # Generate and print the winning candidate summary
-
-
-    # Save the winning candidate summary to the text file
+    txt_file.write(output)
